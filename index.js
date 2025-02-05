@@ -1,57 +1,43 @@
+require('dotenv').config(); // .env dosyasını yükler
 const { Client, GatewayIntentBits } = require('discord.js');
-const { OpenAI } = require('openai');
+const { OpenAI } = require('openai'); // OpenAI istemcisini içe aktar
 
-// Discord token'ınızı burada girin
-const token = process.env.TOKEN;
-
-// OpenAI API anahtarınızı burada girin
-const openai = new OpenAI({
-  apiKey: process.env.KEY,
-});
-
+// Discord botu için istemciyi başlatma
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.MessageContent
   ],
 });
 
-client.once('ready', () => {
-  console.log('Bot başarıyla giriş yaptı!');
+// OpenAI istemcisini başlatma
+const openai = new OpenAI({
+  apiKey: process.env.KEY, // OpenAI API anahtarını .env dosyasından alıyoruz
 });
 
 client.on('messageCreate', async (message) => {
-  // Bot kendine mesaj göndermesin
-  if (message.author.bot) return;
+  if (message.author.bot) return; // Botlardan gelen mesajları yoksay
 
-  // @bot etiketlemesi ile gelen mesajları işleme
-  if (message.content.startsWith(`<@!${client.user.id}>`)) {
-    const prompt = message.content.replace(`<@!${client.user.id}>`, '').trim();
-
+  // Eğer bot etiketlenirse, OpenAI'ye mesaj gönderilir
+  if (message.content.includes(`<@${client.user.id}>`)) {
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo', // Ya da istediğiniz başka bir model
+        model: 'gpt-4', // veya 'gpt-3.5' modelini kullanabilirsiniz
         messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful assistant.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: message.content.replace(`<@${client.user.id}>`, '').trim() }, // Kullanıcı mesajını alır
         ],
       });
 
       // Yanıtı gönderme
       message.reply(response.choices[0].message.content);
     } catch (error) {
-      console.error(error);
-      message.reply('Bir hata oluştu, lütfen tekrar deneyin.');
+      console.error('Error with OpenAI API:', error);
+      message.reply('Bir şeyler ters gitti. Lütfen tekrar deneyin.');
     }
   }
 });
 
-client.login(token);
+// Botu Discord'a bağlamak için login() kullanılır
+client.login(process.env.TOKEN);
