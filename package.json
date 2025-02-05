@@ -1,0 +1,16 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "description": "A Discord bot that interacts with OpenAI",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.7.1",
+    "openai": "^3.1.0",
+    "dotenv": "^16.0.0"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
