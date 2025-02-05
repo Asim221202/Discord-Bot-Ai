@@ -23,12 +23,9 @@ client.on('messageCreate', async (message) => {
   if (message.content.includes(`<@${client.user.id}>`)) {
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-4', // veya 'gpt-3.5' modelini kullanabilirsiniz
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: message.content.replace(`<@${client.user.id}>`, '').trim() }, // Kullanıcı mesajını alır
-        ],
-      });
+  model: 'gpt-3.5-turbo', // veya 'text-davinci-003' kullanabilirsiniz
+  messages: [{ role: 'user', content: 'Hello, how are you?' }],
+});
 
       // Yanıtı gönderme
       message.reply(response.choices[0].message.content);
